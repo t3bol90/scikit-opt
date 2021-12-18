@@ -11,23 +11,15 @@ import math
 from sko.base import SkoBase
 
 
-class City:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def distance(self, city):
-        return math.hypot(self.x - city.x, self.y - city.y)
-
-    def __repr__(self):
-        return f"({self.x}, {self.y})"
-
-
-def path_cost(route):
-    return sum([city.distance(route[index - 1]) for index, city in enumerate(route)])
-
-
 class Particle:
+    @staticmethod
+    def _distance(c1, c2):
+        return math.hypot(c1[0] - c2[0], c1[1] - c2[1])
+
+    @staticmethod
+    def _path_cost(_route):
+        return sum([Particle._distance(city, _route[index - 1]) for index, city in enumerate(_route)])
+
     def __init__(self, route, cost=None):
         self.route = route
         self.pbest = route
@@ -45,13 +37,13 @@ class Particle:
             self.pbest_cost = self.current_cost
 
     def path_cost(self):
-        return path_cost(self.route)
+        return Particle._path_cost(self.route)
 
 
 class PSO(SkoBase):
 
-    def __init__(self, iterations, population_size, gbest_probability=1.0, pbest_probability=1.0, cities=None):
-        self.cities = cities
+    def __init__(self, iterations, population_size, gbest_probability=1.0, pbest_probability=1.0, points=None):
+        self.points = points
         self.gbest = None
         self.gcost_iter = []
         self.iterations = iterations
@@ -64,7 +56,7 @@ class PSO(SkoBase):
         self.particles = [Particle(route=solution) for solution in solutions]
 
     def random_route(self):
-        return random.sample(self.cities, len(self.cities))
+        return random.sample(self.points, len(self.points))
 
     def initial_population(self):
         random_population = [self.random_route()
@@ -73,12 +65,12 @@ class PSO(SkoBase):
         return [*random_population, *greedy_population]
 
     def greedy_route(self, start_index):
-        unvisited = self.cities[:]
+        unvisited = self.points[:]
         del unvisited[start_index]
-        route = [self.cities[start_index]]
+        route = [self.points[start_index]]
         while len(unvisited):
             index, nearest_city = min(
-                enumerate(unvisited), key=lambda item: item[1].distance(route[-1]))
+                enumerate(unvisited), key=lambda item: Particle._distance(item[1], route[-1]))
             route.append(nearest_city)
             del unvisited[index]
         return route
@@ -97,7 +89,7 @@ class PSO(SkoBase):
                 gbest = self.gbest.pbest[:]
                 new_route = particle.route[:]
 
-                for i in range(len(self.cities)):
+                for i in range(len(self.points)):
                     if new_route[i] != particle.pbest[i]:
                         swap = (i, particle.pbest.index(
                             new_route[i]), self.pbest_probability)
@@ -105,7 +97,7 @@ class PSO(SkoBase):
                         new_route[swap[0]], new_route[swap[1]] = \
                             new_route[swap[1]], new_route[swap[0]]
 
-                for i in range(len(self.cities)):
+                for i in range(len(self.points)):
                     if new_route[i] != gbest[i]:
                         swap = (i, gbest.index(
                             new_route[i]), self.gbest_probability)
@@ -122,5 +114,3 @@ class PSO(SkoBase):
 
                 particle.route = new_route
                 particle.update_costs_and_pbest()
-
-# %%
