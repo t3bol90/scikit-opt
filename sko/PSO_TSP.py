@@ -7,7 +7,7 @@
 import random
 import matplotlib.pyplot as plt
 import math
-
+import numpy as np
 from sko.base import SkoBase
 
 
@@ -43,7 +43,7 @@ class Particle:
 class PSO(SkoBase):
 
     def __init__(self, iterations, population_size, gbest_probability=1.0, pbest_probability=1.0, points=None):
-        self.points = points
+        self.points = points.tolist()
         self.gbest = None
         self.gcost_iter = []
         self.iterations = iterations
@@ -56,7 +56,9 @@ class PSO(SkoBase):
         self.particles = [Particle(route=solution) for solution in solutions]
 
     def random_route(self):
-        return random.sample(self.points, len(self.points))
+        res = self.points.copy()
+        np.random.shuffle(res)
+        return res
 
     def initial_population(self):
         random_population = [self.random_route()
@@ -65,7 +67,7 @@ class PSO(SkoBase):
         return [*random_population, *greedy_population]
 
     def greedy_route(self, start_index):
-        unvisited = self.points[:]
+        unvisited = self.points
         del unvisited[start_index]
         route = [self.points[start_index]]
         while len(unvisited):
