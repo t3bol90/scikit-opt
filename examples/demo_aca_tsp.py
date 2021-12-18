@@ -1,3 +1,4 @@
+# %%
 import numpy as np
 from scipy import spatial
 import pandas as pd
@@ -30,3 +31,5 @@ best_points_coordinate = points_coordinate[best_points_, :]
 ax[0].plot(best_points_coordinate[:, 0], best_points_coordinate[:, 1], 'o-r')
 pd.DataFrame(aca.y_best_history).cummin().plot(ax=ax[1])
 plt.show()
+
+# %%
