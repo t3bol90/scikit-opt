@@ -8,6 +8,8 @@ import random
 import matplotlib.pyplot as plt
 import math
 
+from sko.base import SkoBase
+
 
 class City:
     def __init__(self, x, y):
@@ -46,7 +48,7 @@ class Particle:
         return path_cost(self.route)
 
 
-class PSO:
+class PSO(SkoBase):
 
     def __init__(self, iterations, population_size, gbest_probability=1.0, pbest_probability=1.0, cities=None):
         self.cities = cities
@@ -69,7 +71,6 @@ class PSO:
                              for _ in range(self.population_size - 1)]
         greedy_population = [self.greedy_route(0)]
         return [*random_population, *greedy_population]
-        # return [*random_population]
 
     def greedy_route(self, start_index):
         unvisited = self.cities[:]
@@ -84,32 +85,10 @@ class PSO:
 
     def run(self):
         self.gbest = min(self.particles, key=lambda p: p.pbest_cost)
-        print(f"initial cost is {self.gbest.pbest_cost}")
         plt.ion()
         plt.draw()
         for t in range(self.iterations):
             self.gbest = min(self.particles, key=lambda p: p.pbest_cost)
-            # if t % 20 == 0:
-            #     plt.figure(0)
-            #     plt.plot(pso.gcost_iter, 'g')
-            #     plt.ylabel('Distance')
-            #     plt.xlabel('Generation')
-            #     fig = plt.figure(0)
-            #     fig.suptitle('pso iter')
-            #     x_list, y_list = [], []
-            #     for city in self.gbest.pbest:
-            #         x_list.append(city.x)
-            #         y_list.append(city.y)
-            #     x_list.append(pso.gbest.pbest[0].x)
-            #     y_list.append(pso.gbest.pbest[0].y)
-            #     fig = plt.figure(1)
-            #     fig.clear()
-            #     fig.suptitle(f'pso TSP iter {t}')
-
-            #     plt.plot(x_list, y_list, 'ro')
-            #     plt.plot(x_list, y_list, 'g')
-            #     plt.draw()
-            #     plt.pause(.001)
             self.gcost_iter.append(self.gbest.pbest_cost)
 
             for particle in self.particles:
@@ -143,3 +122,5 @@ class PSO:
 
                 particle.route = new_route
                 particle.update_costs_and_pbest()
+
+# %%
