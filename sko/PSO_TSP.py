@@ -55,8 +55,10 @@ class PSO(SkoBase):
         self.particles = [Particle(route=solution) for solution in solutions]
 
     def random_route(self):
-        return random.sample(self.points, len(self.points))
-
+        res = self.points[:]
+        random.shuffle(res)
+        # return random.sample(self.points, len(self.points))
+        return res
     def initial_population(self):
         random_population = [self.random_route()
                              for _ in range(self.population_size - 1)]
