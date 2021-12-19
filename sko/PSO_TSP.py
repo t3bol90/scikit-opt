@@ -5,7 +5,6 @@
 
 # %%
 import random
-import matplotlib.pyplot as plt
 import math
 import numpy as np
 from sko.base import SkoBase
@@ -65,7 +64,7 @@ class PSO(SkoBase):
         return [*random_population, *greedy_population]
 
     def greedy_route(self, start_index):
-        unvisited = self.points
+        unvisited = self.points[:]
         del unvisited[start_index]
         route = [self.points[start_index]]
         while len(unvisited):
@@ -77,8 +76,6 @@ class PSO(SkoBase):
 
     def run(self):
         self.gbest = min(self.particles, key=lambda p: p.pbest_cost)
-        plt.ion()
-        plt.draw()
         for t in range(self.iterations):
             self.gbest = min(self.particles, key=lambda p: p.pbest_cost)
             self.gcost_iter.append(self.gbest.pbest_cost)
